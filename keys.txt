@@ -1,0 +1,58 @@
+host: 
+https://iot-esp32-a458a-default-rtdb.firebaseio.com
+
+Api key: 
+zfZuBpepTD3TAob2SYFxCeuiSkPj3FYo8SmkB4ES
+
+web:
+dl.espressif.com/dl/package_esp32_index.json
+
+
+esp32:
+#include <WiFi.h>
+#include "FirebaseESP32.h"
+
+#define FIREBASE_HOST "iot-esp32-a458a-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "zfZuBpepTD3TAob2SYFxCeuiSkPj3FYo8SmkB4ES"
+#define WIFI_SSID "Telecable-C208"
+#define WIFI_PASSWORD "z72AJ6jp0n"
+
+FirebaseData firebaseData;
+String path = "/iot";  // Se ajustó la ruta según tu estructura de base de datos
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(2,OUTPUT);
+
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);  // Se corrigió el nombre de la función "Wifi" a "WiFi"
+  Serial.print("[Wi-Fi]...Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
+
+  //Firewall that allows only GET and POST requests
+  //Firebase.enableClassicRequest(firebaseData, true);
+}
+
+void loop() {
+  if (Firebase.getInt(firebaseData, path + "/LED")) {  
+    Serial.println("Data=" + String(firebaseData.intData()));
+    delay(200);
+    if (firebaseData.intData()==1) {
+      digitalWrite(2,HIGH);
+    } else {
+      digitalWrite(2,LOW);
+    }
+  } else {
+    Serial.println("Failed to get data from Firebase");
+  }
+  delay(2000);  // Se añadió un retraso para evitar lecturas excesivas
+}
