@@ -7,14 +7,14 @@ document.addEventListener('DOMContentLoaded', function () {
         ledState.textContent = isLedOn ? 'Encendido (ON)' : 'Apagado (OFF)';
         
         // Actualiza el valor del LED en el servidor
-        updateLedState(isLedOn);
+        updateLedState(isLedOn ? '1' : '0');
     });
 
     // Función para realizar la solicitud al servidor
-    function updateLedState(isLedOn) {
+    function updateLedState(ledValue) {
         const url = 'https://backend-iot-9945b3a20353.herokuapp.com/dispositivos/1';
         const payload = {
-            valor: isLedOn ? '1' : '0'
+            valor: ledValue
         };
 
         fetch(url, {
